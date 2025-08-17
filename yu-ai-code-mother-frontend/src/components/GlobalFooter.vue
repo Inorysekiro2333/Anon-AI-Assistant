@@ -2,8 +2,13 @@
   <a-layout-footer class="footer">
     <div class="footer-content">
       <p class="copyright">
-        <a href="https://www.bilibili.com" target="_blank" rel="noopener noreferrer" class="author-link">
-          by 千早爱音
+        <a
+          href="https://github.com/Inorysekiro2333"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="author-link"
+        >
+          AI 项目 by 程序员爱音
         </a>
       </p>
     </div>
@@ -16,13 +21,12 @@
 
 <style scoped>
 .footer {
-  background: #efefef;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
   text-align: center;
   padding: 20px;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  margin-top: 40px;
+  border-top: 1px solid rgba(102, 126, 234, 0.1);
 }
 
 .copyright {
