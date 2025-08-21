@@ -1,17 +1,18 @@
 package com.yupi.yuaicodemother.controller;
 
 import com.mybatisflex.core.paginate.Page;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import com.yupi.yuaicodemother.common.BaseResponse;
+import com.yupi.yuaicodemother.common.ResultUtils;
+import com.yupi.yuaicodemother.model.entity.User;
+import com.yupi.yuaicodemother.service.UserService;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yupi.yuaicodemother.model.entity.ChatHistory;
 import com.yupi.yuaicodemother.service.ChatHistoryService;
-import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -23,8 +24,31 @@ import java.util.List;
 @RequestMapping("/chatHistory")
 public class ChatHistoryController {
 
-    @Autowired
+    @Resource
     private ChatHistoryService chatHistoryService;
+
+    @Resource
+    private UserService userService;
+
+    /**
+     * 分页查询某个应用的对话历史（游标查询）
+     *
+     * @param appId          应用ID
+     * @param pageSize       页面大小
+     * @param lastCreateTime 最后一条记录的创建时间
+     * @param request        请求
+     * @return 对话历史分页
+     */
+    @GetMapping("/app/{appId}")
+    public BaseResponse<Page<ChatHistory>> listAppChatHistory(@PathVariable Long appId,
+                                                              @RequestParam(defaultValue = "10") int pageSize,
+                                                              @RequestParam(required = false) LocalDateTime lastCreateTime,
+                                                              HttpServletRequest request) {
+        User loginUser = userService.getLoginUser(request);
+        Page<ChatHistory> result = chatHistoryService.listAppChatHistoryByPage(appId, pageSize, lastCreateTime, loginUser);
+        return ResultUtils.success(result);
+    }
+
 
     /**
      * 保存对话历史。
