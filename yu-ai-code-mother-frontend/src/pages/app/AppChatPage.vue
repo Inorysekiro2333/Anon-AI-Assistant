@@ -9,25 +9,26 @@
         </a-tag>
       </div>
       <div class="header-right">
-        <a-button type="default" @click="showAppDetail">
+        <a-button type="default" @click="showAppDetail" class="header-btn">
           <template #icon>
             <InfoCircleOutlined />
           </template>
           应用详情
         </a-button>
         <a-button
-            type="primary"
-            ghost
-            @click="downloadCode"
-            :loading="downloading"
-            :disabled="!isOwner"
+          type="primary"
+          ghost
+          @click="downloadCode"
+          :loading="downloading"
+          :disabled="!isOwner"
+          class="header-btn"
         >
           <template #icon>
             <DownloadOutlined />
           </template>
           下载代码
         </a-button>
-        <a-button type="primary" @click="deployApp" :loading="deploying">
+        <a-button type="primary" @click="deployApp" :loading="deploying" class="header-btn primary">
           <template #icon>
             <CloudUploadOutlined />
           </template>
@@ -48,6 +49,7 @@
               加载更多历史消息
             </a-button>
           </div>
+          
           <div v-for="(message, index) in messages" :key="index" class="message-item">
             <div v-if="message.type === 'user'" class="user-message">
               <div class="message-content">{{ message.content }}</div>
@@ -72,11 +74,11 @@
 
         <!-- 选中元素信息展示 -->
         <a-alert
-            v-if="selectedElementInfo"
-            class="selected-element-alert"
-            type="info"
-            closable
-            @close="clearSelectedElement"
+          v-if="selectedElementInfo"
+          class="selected-element-alert"
+          type="info"
+          closable
+          @close="clearSelectedElement"
         >
           <template #message>
             <div class="selected-element-info">
@@ -113,57 +115,62 @@
           <div class="input-wrapper">
             <a-tooltip v-if="!isOwner" title="无法在别人的作品下对话哦~" placement="top">
               <a-textarea
-                  v-model:value="userInput"
-                  :placeholder="getInputPlaceholder()"
-                  :rows="4"
-                  :maxlength="1000"
-                  @keydown.enter.prevent="sendMessage"
-                  :disabled="isGenerating || !isOwner"
-              />
-            </a-tooltip>
-            <a-textarea
-                v-else
                 v-model:value="userInput"
                 :placeholder="getInputPlaceholder()"
                 :rows="4"
                 :maxlength="1000"
                 @keydown.enter.prevent="sendMessage"
-                :disabled="isGenerating"
+                :disabled="isGenerating || !isOwner"
+                class="chat-input"
+              />
+            </a-tooltip>
+            <a-textarea
+              v-else
+              v-model:value="userInput"
+              :placeholder="getInputPlaceholder()"
+              :rows="4"
+              :maxlength="1000"
+              @keydown.enter.prevent="sendMessage"
+              :disabled="isGenerating"
+              class="chat-input"
             />
             <div class="input-actions">
               <a-button
-                  type="primary"
-                  @click="sendMessage"
-                  :loading="isGenerating"
-                  :disabled="!isOwner"
+                type="primary"
+                @click="sendMessage"
+                :loading="isGenerating"
+                :disabled="!isOwner"
+                class="send-btn"
               >
                 <template #icon>
                   <SendOutlined />
                 </template>
+                发送
               </a-button>
             </div>
           </div>
         </div>
       </div>
+      
       <!-- 右侧网页展示区域 -->
       <div class="preview-section">
         <div class="preview-header">
           <h3>生成后的网页展示</h3>
           <div class="preview-actions">
             <a-button
-                v-if="isOwner && previewUrl"
-                type="link"
-                :danger="isEditMode"
-                @click="toggleEditMode"
-                :class="{ 'edit-mode-active': isEditMode }"
-                style="padding: 0; height: auto; margin-right: 12px"
+              v-if="isOwner && previewUrl"
+              type="link"
+              :danger="isEditMode"
+              @click="toggleEditMode"
+              :class="{ 'edit-mode-active': isEditMode }"
+              class="edit-mode-btn"
             >
               <template #icon>
                 <EditOutlined />
               </template>
               {{ isEditMode ? '退出编辑' : '编辑模式' }}
             </a-button>
-            <a-button v-if="previewUrl" type="link" @click="openInNewTab">
+            <a-button v-if="previewUrl" type="link" @click="openInNewTab" class="preview-action-btn">
               <template #icon>
                 <ExportOutlined />
               </template>
@@ -181,11 +188,11 @@
             <p>正在生成网站...</p>
           </div>
           <iframe
-              v-else
-              :src="previewUrl"
-              class="preview-iframe"
-              frameborder="0"
-              @load="onIframeLoad"
+            v-else
+            :src="previewUrl"
+            class="preview-iframe"
+            frameborder="0"
+            @load="onIframeLoad"
           ></iframe>
         </div>
       </div>
@@ -193,18 +200,18 @@
 
     <!-- 应用详情弹窗 -->
     <AppDetailModal
-        v-model:open="appDetailVisible"
-        :app="appInfo"
-        :show-actions="isOwner || isAdmin"
-        @edit="editApp"
-        @delete="deleteApp"
+      v-model:open="appDetailVisible"
+      :app="appInfo"
+      :show-actions="isOwner || isAdmin"
+      @edit="editApp"
+      @delete="deleteApp"
     />
 
     <!-- 部署成功弹窗 -->
     <DeploySuccessModal
-        v-model:open="deployModalVisible"
-        :deploy-url="deployUrl"
-        @open-site="openDeployedSite"
+      v-model:open="deployModalVisible"
+      :deploy-url="deployUrl"
+      @open-site="openDeployedSite"
     />
   </div>
 </template>
@@ -774,8 +781,7 @@ onUnmounted(() => {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  padding: 16px;
-  background: #fdfdfd;
+  background: var(--bg-secondary);
 }
 
 /* 顶部栏 */
@@ -783,37 +789,63 @@ onUnmounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--spacing-md);
 }
 
 .code-gen-type-tag {
   font-size: 12px;
+  border-radius: var(--radius-md);
 }
 
 .app-name {
   margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #1a1a1a;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
 .header-right {
   display: flex;
-  gap: 12px;
+  gap: var(--spacing-sm);
+}
+
+.header-btn {
+  border-radius: var(--radius-lg);
+  height: 36px;
+  padding: 0 var(--spacing-md);
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.header-btn:hover {
+  transform: translateY(-1px);
+}
+
+.header-btn.primary {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+  border: none;
+  box-shadow: var(--shadow-md);
+}
+
+.header-btn.primary:hover {
+  box-shadow: var(--shadow-lg);
 }
 
 /* 主要内容区域 */
 .main-content {
   flex: 1;
   display: flex;
-  gap: 16px;
-  padding: 8px;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-lg);
   overflow: hidden;
 }
 
@@ -822,54 +854,58 @@ onUnmounted(() => {
   flex: 2;
   display: flex;
   flex-direction: column;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: var(--bg-primary);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
   overflow: hidden;
+  border: 1px solid var(--border-light);
 }
 
 .messages-container {
-  flex: 0.9;
-  padding: 16px;
+  flex: 1;
+  padding: var(--spacing-lg);
   overflow-y: auto;
   scroll-behavior: smooth;
 }
 
 .message-item {
-  margin-bottom: 12px;
+  margin-bottom: var(--spacing-lg);
 }
 
 .user-message {
   display: flex;
   justify-content: flex-end;
   align-items: flex-start;
-  gap: 8px;
+  gap: var(--spacing-md);
 }
 
 .ai-message {
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
-  gap: 8px;
+  gap: var(--spacing-md);
 }
 
 .message-content {
   max-width: 70%;
-  padding: 12px 16px;
-  border-radius: 12px;
-  line-height: 1.5;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-xl);
+  line-height: 1.6;
   word-wrap: break-word;
+  box-shadow: var(--shadow-sm);
 }
 
 .user-message .message-content {
-  background: #1890ff;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
   color: white;
+  border-bottom-right-radius: var(--radius-sm);
 }
 
 .ai-message .message-content {
-  background: #f5f5f5;
-  color: #1a1a1a;
-  padding: 8px 12px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-light);
+  border-bottom-left-radius: var(--radius-sm);
 }
 
 .message-avatar {
@@ -879,35 +915,64 @@ onUnmounted(() => {
 .loading-indicator {
   display: flex;
   align-items: center;
-  gap: 8px;
-  color: #666;
+  gap: var(--spacing-sm);
+  color: var(--text-secondary);
+  font-size: 14px;
 }
 
 /* 加载更多按钮 */
 .load-more-container {
   text-align: center;
-  padding: 8px 0;
-  margin-bottom: 16px;
+  padding: var(--spacing-md) 0;
+  margin-bottom: var(--spacing-lg);
 }
 
 /* 输入区域 */
 .input-container {
-  padding: 16px;
-  background: white;
+  padding: var(--spacing-lg);
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-light);
 }
 
 .input-wrapper {
   position: relative;
 }
 
-.input-wrapper .ant-input {
-  padding-right: 50px;
+.chat-input {
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-color);
+  font-size: 14px;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--bg-primary);
+  resize: none;
+  transition: all 0.3s ease;
+}
+
+.chat-input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
 .input-actions {
   position: absolute;
-  bottom: 8px;
-  right: 8px;
+  bottom: var(--spacing-sm);
+  right: var(--spacing-sm);
+}
+
+.send-btn {
+  border-radius: var(--radius-lg);
+  height: 36px;
+  padding: 0 var(--spacing-md);
+  background: var(--primary-color);
+  border: none;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+}
+
+.send-btn:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 /* 右侧预览区域 */
@@ -915,29 +980,57 @@ onUnmounted(() => {
   flex: 3;
   display: flex;
   flex-direction: column;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: var(--bg-primary);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
   overflow: hidden;
+  border: 1px solid var(--border-light);
 }
 
 .preview-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px;
-  border-bottom: 1px solid #e8e8e8;
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--border-light);
+  background: var(--bg-secondary);
 }
 
 .preview-header h3 {
   margin: 0;
   font-size: 16px;
   font-weight: 600;
+  color: var(--text-primary);
 }
 
 .preview-actions {
   display: flex;
-  gap: 8px;
+  gap: var(--spacing-sm);
+}
+
+.edit-mode-btn {
+  padding: 0;
+  height: auto;
+  margin-right: var(--spacing-sm);
+  border-radius: var(--radius-md);
+  transition: all 0.3s ease;
+}
+
+.edit-mode-active {
+  background-color: var(--success-color) !important;
+  border-color: var(--success-color) !important;
+  color: white !important;
+}
+
+.edit-mode-active:hover {
+  background-color: #73d13d !important;
+  border-color: #73d13d !important;
+}
+
+.preview-action-btn {
+  padding: 0;
+  height: auto;
+  border-radius: var(--radius-md);
 }
 
 .preview-content {
@@ -952,12 +1045,14 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   height: 100%;
-  color: #666;
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
 }
 
 .placeholder-icon {
   font-size: 48px;
-  margin-bottom: 16px;
+  margin-bottom: var(--spacing-md);
+  opacity: 0.6;
 }
 
 .preview-loading {
@@ -966,27 +1061,83 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   height: 100%;
-  color: #666;
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
 }
 
 .preview-loading p {
-  margin-top: 16px;
+  margin-top: var(--spacing-md);
+  font-size: 14px;
 }
 
 .preview-iframe {
   width: 100%;
   height: 100%;
   border: none;
+  background: white;
 }
 
 .selected-element-alert {
-  margin: 0 16px;
+  margin: 0 var(--spacing-lg);
+  border-radius: var(--radius-lg);
+}
+
+.selected-element-info {
+  line-height: 1.4;
+}
+
+.element-header {
+  margin-bottom: var(--spacing-sm);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.element-details {
+  margin-top: var(--spacing-sm);
+}
+
+.element-item {
+  margin-bottom: var(--spacing-xs);
+  font-size: 13px;
+}
+
+.element-item:last-child {
+  margin-bottom: 0;
+}
+
+.element-tag {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--info-color);
+}
+
+.element-id {
+  color: var(--success-color);
+  font-family: var(--font-mono);
+}
+
+.element-class {
+  color: var(--warning-color);
+  font-family: var(--font-mono);
+}
+
+.element-selector-code {
+  font-family: var(--font-mono);
+  background: var(--bg-tertiary);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  color: var(--error-color);
+  border: 1px solid var(--border-color);
 }
 
 /* 响应式设计 */
 @media (max-width: 1024px) {
   .main-content {
     flex-direction: column;
+    gap: var(--spacing-md);
   }
 
   .chat-section,
@@ -998,85 +1149,121 @@ onUnmounted(() => {
 
 @media (max-width: 768px) {
   .header-bar {
-    padding: 12px 16px;
+    padding: var(--spacing-sm) var(--spacing-md);
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    align-items: stretch;
+  }
+
+  .header-left {
+    justify-content: center;
+  }
+
+  .header-right {
+    justify-content: center;
   }
 
   .app-name {
-    font-size: 16px;
+    font-size: 18px;
   }
 
   .main-content {
-    padding: 8px;
-    gap: 8px;
+    padding: var(--spacing-md);
+    gap: var(--spacing-md);
   }
 
   .message-content {
     max-width: 85%;
   }
 
-  /* 选中元素信息样式 */
   .selected-element-alert {
-    margin: 0 16px;
-  }
-
-  .selected-element-info {
-    line-height: 1.4;
+    margin: 0 var(--spacing-md);
   }
 
   .element-header {
-    margin-bottom: 8px;
+    flex-direction: column;
+    gap: var(--spacing-xs);
   }
 
   .element-details {
-    margin-top: 8px;
+    margin-top: var(--spacing-sm);
   }
 
   .element-item {
-    margin-bottom: 4px;
+    margin-bottom: var(--spacing-xs);
+    font-size: 12px;
+  }
+
+  .element-tag,
+  .element-id,
+  .element-class {
     font-size: 13px;
   }
 
-  .element-item:last-child {
-    margin-bottom: 0;
-  }
-
-  .element-tag {
-    font-family: 'Monaco', 'Menlo', monospace;
-    font-size: 14px;
-    font-weight: 600;
-    color: #007bff;
-  }
-
-  .element-id {
-    color: #28a745;
-    margin-left: 4px;
-  }
-
-  .element-class {
-    color: #ffc107;
-    margin-left: 4px;
-  }
-
   .element-selector-code {
-    font-family: 'Monaco', 'Menlo', monospace;
-    background: #f6f8fa;
-    padding: 2px 4px;
-    border-radius: 3px;
-    font-size: 12px;
-    color: #d73a49;
-    border: 1px solid #e1e4e8;
+    font-size: 11px;
+    padding: 1px 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-bar {
+    padding: var(--spacing-sm);
   }
 
-  /* 编辑模式按钮样式 */
-  .edit-mode-active {
-    background-color: #52c41a !important;
-    border-color: #52c41a !important;
-    color: white !important;
+  .app-name {
+    font-size: 16px;
   }
 
-  .edit-mode-active:hover {
-    background-color: #73d13d !important;
-    border-color: #73d13d !important;
+  .header-btn {
+    height: 32px;
+    padding: 0 var(--spacing-sm);
+    font-size: 13px;
+  }
+
+  .main-content {
+    padding: var(--spacing-sm);
+  }
+
+  .messages-container {
+    padding: var(--spacing-md);
+  }
+
+  .message-content {
+    max-width: 90%;
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 13px;
+  }
+
+  .input-container {
+    padding: var(--spacing-md);
+  }
+
+  .chat-input {
+    font-size: 13px;
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+
+  .send-btn {
+    height: 32px;
+    padding: 0 var(--spacing-sm);
+    font-size: 13px;
+  }
+
+  .preview-header {
+    padding: var(--spacing-md);
+  }
+
+  .preview-header h3 {
+    font-size: 15px;
+  }
+
+  .placeholder-icon {
+    font-size: 36px;
+  }
+
+  .preview-loading p {
+    font-size: 13px;
   }
 }
 </style>
