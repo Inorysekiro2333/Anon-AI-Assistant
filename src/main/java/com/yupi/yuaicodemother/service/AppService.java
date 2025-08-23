@@ -51,4 +51,13 @@ public interface AppService extends IService<App> {
      * @return 返回一个String类型可访问的URL
      */
     String deployApp(Long appId, User loginUser);
+
+
+    /**
+     * 异步生成应用截图的方法
+     *
+     * @param appId 应用程序的唯一标识符
+     * @param appUrl 应用程序的URL
+     */
+    void generateAppScreenshotAsync(Long appId, String appUrl);
 }
