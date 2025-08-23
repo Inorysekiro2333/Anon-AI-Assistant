@@ -6,6 +6,7 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
+import com.yupi.yuaicodemother.ai.AiCodeGenTypeRoutingService;
 import com.yupi.yuaicodemother.constant.AppConstant;
 import com.yupi.yuaicodemother.core.AiCodeGeneratorFacade;
 import com.yupi.yuaicodemother.core.builder.VueProjectBuilder;
@@ -13,6 +14,7 @@ import com.yupi.yuaicodemother.core.handler.StreamHandlerExecutor;
 import com.yupi.yuaicodemother.exception.BusinessException;
 import com.yupi.yuaicodemother.exception.ErrorCode;
 import com.yupi.yuaicodemother.exception.ThrowUtils;
+import com.yupi.yuaicodemother.model.dto.app.AppAddRequest;
 import com.yupi.yuaicodemother.model.dto.app.AppQueryRequest;
 import com.yupi.yuaicodemother.model.entity.App;
 import com.yupi.yuaicodemother.mapper.AppMapper;
@@ -64,6 +66,39 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 
     @Resource
     private ScreenshotService screenshotService;
+
+    @Resource
+    private AiCodeGenTypeRoutingService aiCodeGenTypeRoutingService;
+
+    /**
+     * 创建应用的方法
+     *
+     * @param appAddRequest 应用添加请求参数
+     * @param loginUser     当前登录用户
+     * @return 新创建的应用ID
+     */
+    @Override
+    public Long createApp(AppAddRequest appAddRequest, User loginUser) {
+        // 参数校验：检查初始化prompt是否为空
+        String initPrompt = appAddRequest.getInitPrompt();
+        ThrowUtils.throwIf(StrUtil.isBlank(initPrompt), ErrorCode.PARAMS_ERROR, "初始化 prompt 不能为空");
+        // 构造入库对象：将请求参数复制到App实体对象中
+        App app = new App();
+        BeanUtil.copyProperties(appAddRequest, app);
+        app.setUserId(loginUser.getId()); // 设置用户ID
+        // 应用名称暂时为 initPrompt 前 12 位
+        app.setAppName(initPrompt.substring(0, Math.min(initPrompt.length(), 12)));
+        // 使用 AI 智能选择代码生成类型
+        CodeGenTypeEnum selectedCodeGenType = aiCodeGenTypeRoutingService.routeCodeGenType(initPrompt);
+        app.setCodeGenType(selectedCodeGenType.getValue()); // 设置代码生成类型
+        // 插入数据库：保存应用信息
+        boolean result = this.save(app);
+        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
+        // 记录应用创建成功的日志
+        log.info("应用创建成功，ID: {}, 类型: {}", app.getId(), selectedCodeGenType.getValue());
+        return app.getId(); // 返回新创建的应用ID
+    }
+
 
     @Override
     public Flux<String> chatToGenCode(Long appId, String message, User loginUser) {

@@ -2,7 +2,7 @@ package com.yupi.yuaicodemother.ai;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.yupi.yuaicodemother.ai.tools.FileWriteTool;
+import com.yupi.yuaicodemother.ai.tools.*;
 import com.yupi.yuaicodemother.exception.BusinessException;
 import com.yupi.yuaicodemother.exception.ErrorCode;
 import com.yupi.yuaicodemother.model.enums.CodeGenTypeEnum;
@@ -41,6 +41,9 @@ public class AiCodeGeneratorServiceFactory {
 
     @Resource
     private ChatHistoryService chatHistoryService;
+
+    @Resource
+    private ToolManager toolManager;
 
 //    /**
 //     * 创建 AI 代码生成器服务
@@ -111,16 +114,14 @@ public class AiCodeGeneratorServiceFactory {
         // 根据代码生成类型选择不同的模型配置和工具
         return switch (codeGenType) {
             // Vue 项目生成，使用工具调用推理模型，支持文件写入功能
+            // Vue 项目生成使用推理模型
             case VUE_PROJECT -> AiServices.builder(AiCodeGeneratorService.class)
-                    .chatModel(chatModel)
                     .streamingChatModel(reasoningStreamingChatModel)
-                    .chatMemory(chatMemory)
-                    .chatMemoryProvider(memoryId -> chatMemory)  // 提供对话记忆
-                    .tools(new FileWriteTool())  // 添加文件写入工具
-                    // 处理工具调用幻觉问题，当工具不存在时返回错误信息
-                    .hallucinatedToolNameStrategy(toolExecutionRequest ->
-                            ToolExecutionResultMessage.from(toolExecutionRequest, "Error: there is no tool called " + toolExecutionRequest.name())
-                    )
+                    .chatMemoryProvider(memoryId -> chatMemory)
+                    .tools(toolManager.getAllTools())
+                    .hallucinatedToolNameStrategy(toolExecutionRequest -> ToolExecutionResultMessage.from(
+                            toolExecutionRequest, "Error: there is no tool called " + toolExecutionRequest.name()
+                    ))
                     .build();
 
             // 其他类型，使用流式对话模型

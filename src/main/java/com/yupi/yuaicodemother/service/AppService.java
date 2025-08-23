@@ -2,6 +2,7 @@ package com.yupi.yuaicodemother.service;
 
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.service.IService;
+import com.yupi.yuaicodemother.model.dto.app.AppAddRequest;
 import com.yupi.yuaicodemother.model.dto.app.AppQueryRequest;
 import com.yupi.yuaicodemother.model.entity.App;
 import com.yupi.yuaicodemother.model.entity.User;
@@ -41,6 +42,16 @@ public interface AppService extends IService<App> {
      */
     List<AppVO> getAppVOList(List<App> appList);
 
+
+    /**
+     * 创建应用的方法
+     *
+     * @param appAddRequest
+     * @param loginUser
+     * @return
+     */
+    Long createApp(AppAddRequest appAddRequest, User loginUser);
+
     Flux<String> chatToGenCode(Long appId, String message, User loginUser);
 
     /**
@@ -56,7 +67,7 @@ public interface AppService extends IService<App> {
     /**
      * 异步生成应用截图的方法
      *
-     * @param appId 应用程序的唯一标识符
+     * @param appId  应用程序的唯一标识符
      * @param appUrl 应用程序的URL
      */
     void generateAppScreenshotAsync(Long appId, String appUrl);
